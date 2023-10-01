@@ -28,3 +28,49 @@ today = date.today()
 file_suffix = today.strftime("%Y%m%d")
 file_name = f"attendance_{file_suffix}.xlsx"
 
+# Create a new Excel workbook if it doesn't exist
+try:
+    workbook = load_workbook("attendance.xlsx")
+except FileNotFoundError:
+    workbook = openpyxl.Workbook()
+    workbook.active.append(["Date", "Student Name", "Attendance Status"])
+    workbook.save("attendance.xlsx")
+
+# Select the active sheet
+sheet = workbook.active
+
+# Create a tkinter window (GUI)
+root = tk.Tk()
+root.title("Attendance Tracker")
+
+# Create a listbox to display attendance records
+attendance_listbox = tk.Listbox(root)
+attendance_listbox.pack(fill=tk.BOTH, expand=True)
+
+# Load previous attendance records
+load_previous_attendance()
+
+# Input attendance using dialogs until the user is finished
+while True:
+    student_name, attendance_status = input_attendance()
+    if student_name is None:
+        break
+
+    # Find the first empty row in the sheet
+    row_number = sheet.max_row + 1
+
+    # Populate the sheet with data
+    sheet[f"A{row_number}"] = today.strftime("%Y-%m-%d")
+    sheet[f"B{row_number}"] = student_name
+    sheet[f"C{row_number}"] = attendance_status
+
+    # Update the attendance listbox
+    attendance_listbox.insert(tk.END, f"Date: {today.strftime('%Y-%m-%d')}, Student: {student_name}, Status: {attendance_status}")
+
+# Save the workbook
+workbook.save("attendance.xlsx")
+
+messagebox.showinfo("Info", f"Attendance recorded successfully.")
+
+# Run the tkinter main loop
+root.mainloop()
