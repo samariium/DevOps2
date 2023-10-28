@@ -1,1 +1,1 @@
-# School Attendance Tracker
+# Attendance Tracker
